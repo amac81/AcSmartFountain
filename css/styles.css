@@ -1,0 +1,83 @@
+/* GERAL */
+* {
+    margin:0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial;
+}
+
+body {
+    background-color: #fff;    
+}
+
+header {
+    background-color: aquamarine;
+    
+    padding: 1rem;
+}
+
+header h1 {
+	color: #00008B;
+}
+
+#main-container {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#fountain-container {
+    float: left;
+    width: 60%;
+    padding:2rem;
+    
+    background-color:blanchedalmond;
+}
+
+#fountain-container img {
+    max-width: fit-content;
+}
+
+#control-container {
+    float: right;
+    width: 40%;
+    padding:0.5rem;
+    background-color: cadetblue;
+    display: grid;
+}
+
+/* Controls */
+#led-control-container,
+#pump-control-container,
+#fog-control-container { 
+    display: flex;
+    padding:2rem;
+    margin-bottom: 1rem;
+}
+
+#led-control-container {
+    background-color: chartreuse;    
+}
+
+#pump-control-container {
+    background-color:darkkhaki;    
+}
+
+#fog-control-container {
+    background-color:tomato;
+    margin-bottom: 0rem;
+}
+
+
+/* Footer */
+
+footer {
+    display: flex;
+    width: 100%;
+    background-color: aquamarine;
+
+}
+
+footer h3 {
+	color: #00008B;
+}
