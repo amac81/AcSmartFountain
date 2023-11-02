@@ -27,16 +27,56 @@ header h1 {
 }
 
 #fountain-container {
-    float: left;
-    width: 60%;
-    padding:2rem;
-    
-    background-color:blanchedalmond;
+    float: left; 
+    position: relative;
+    background-color:rgb(17, 16, 15);
 }
 
-#fountain-container img {
-    max-width: fit-content;
+#fog-img {
+    position: absolute;
+    width: 255px;
+    height: 152px;
+    bottom: 142px;
+    left: 50px;
+    display: none; 
 }
+
+#water-stream-img1 {
+    position: absolute;
+    width: 77px;
+    top: 185px;
+    left: 90px;
+}
+
+#water-stream-img2 {
+    position: absolute;
+    width: 77px;
+    height: 50px;
+    top: 275px;
+    left: 190px;
+    rotate: 20deg;
+}
+
+
+#water-stream-img3 {
+    position: absolute;
+    width: 77px;
+    height: 50px;
+    bottom: 225px;
+    left: 92px;
+    rotate: -10deg;
+}
+
+#water-stream-img4 {
+    position: absolute;
+    width: 77px;
+    height: 40px;
+    bottom: 137px;
+    right: 92px;
+    rotate: 10deg;
+}
+
+
 
 #control-container {
     float: right;
