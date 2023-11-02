@@ -20,6 +20,10 @@ header h1 {
 	color: #00008B;
 }
 
+.hide {
+    display: none;
+}
+
 #main-container {
     width: 100%;
     margin: 0;
@@ -46,6 +50,7 @@ header h1 {
     width: 77px;
     top: 185px;
     left: 90px;
+    opacity: 1;
 }
 
 #water-stream-img2 {
@@ -55,6 +60,7 @@ header h1 {
     top: 275px;
     left: 190px;
     rotate: 20deg;
+    opacity: 1;
 }
 
 
@@ -65,6 +71,7 @@ header h1 {
     bottom: 225px;
     left: 92px;
     rotate: -10deg;
+    opacity: 1;
 }
 
 #water-stream-img4 {
@@ -74,6 +81,7 @@ header h1 {
     bottom: 137px;
     right: 92px;
     rotate: 10deg;
+    opacity: 1;
 }
 
 
