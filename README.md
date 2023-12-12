@@ -4,7 +4,7 @@
 
 # About the project
 
-Arduino, CSS, HTML, Javascript project to control a indoor fountain 
+ESP32 microcontroller, CSS, HTML, Javascript project to control a indoor fountain 
 
 # Author
 
