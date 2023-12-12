@@ -1,85 +1,47 @@
 // Element Select
-
-const pumpPowerControl =  document.querySelector("#pump-power-control");
-
-const fogImg =  document.querySelector("#fog-img");
-const waterStreamImg1 =  document.querySelector("#water-stream-img1");
-const waterStreamImg2 =  document.querySelector("#water-stream-img2");
-const waterStreamImg3 =  document.querySelector("#water-stream-img3");
-const waterStreamImg4 =  document.querySelector("#water-stream-img4");
+const color = document.querySelector("#color");
+const ledStripHEXColor = document.querySelector("#ledStripHEXColor");
+const ledStripRGBColor = document.querySelector("#ledStripRGBColor");
 
 // global variables
 
-let myTimer1;
 
 // Functions
 
-
-
-
-const initialize = () => {
-    //pumpPowerControl.value = 10;
-//    controlWaterStreamsFlow();
-
+function updateSliderPWM(element) {
+  let motorSliderValue = document.getElementById("pwmMotorSlider").value;
+  document.getElementById("textMotorSliderValue").innerHTML = motorSliderValue;
+  let xhr = new XMLHttpRequest();
+  xhr.open("GET", "/motorslider?value="+motorSliderValue, true);
+  xhr.send();
 }
 
-const animeWaterStream = (waterStreamElem, time) => {
-    
-    let currentOpacity = getComputedStyle(waterStreamElem).getPropertyValue("opacity");
-    const changeFactor = 0.05;
-
-    console.log(time)
-
-    myTimer1 = setInterval(() => {
-
-        if(currentOpacity < 0){
-            currentOpacity = 0.98;
-        }
-        else {
-            currentOpacity -= changeFactor;        
-            waterStreamElem.setAttribute("style",`opacity:${currentOpacity}`) ;           
-        }
-        
-    }, time);
-
+function updateRgbColor(value) {
+  let xhr = new XMLHttpRequest();
+  xhr.open("GET", "/ledstripcolor?value="+value, true);
+  xhr.send();
 }
 
-const controlWaterStreamsFlow = (flowFactor) => {
-   
-    const time1 = 45 + (+flowFactor);
-    /*const time2 = 255 - (+flowFactor);
-    const time3 = 265 - (+flowFactor);
-    const time4 = 275 - (+flowFactor);*/
-    
+function updateBrigthness(element) {
+  let brightnessValue = document.getElementById("brightnessSlider").value;
+  document.getElementById("textBrightnessSliderValue").innerHTML = brightnessValue;
+  let xhr = new XMLHttpRequest();
 
-    /*clearInterval(myTimer2);
-    clearInterval(myTimer3);
-    clearInterval(myTimer4);*/
-    
-    animeWaterStream(waterStreamImg1, time1);
-    /*animeWaterStream(waterStreamImg2, myTimer2, time2);
-    animeWaterStream(waterStreamImg3, myTimer3, time3);
-    animeWaterStream(waterStreamImg4, myTimer4, time4);*/    
-};
+  xhr.open("GET", "/brigthness?value="+brightnessValue, true);
+  xhr.send();
+}
 
+function hexToRgb (hex) {
+  return `${("0x"+ hex[1] + hex[2]) | 0}_${("0x" + hex[3] + hex[4]) | 0}_${("0x" + hex[5] + hex[6]) | 0}`;
+}
 
 // Events
 
-pumpPowerControl.addEventListener("input", (e) => {
-    clearInterval(myTimer1);
-    
-    const value = e.target.value;
+color.addEventListener("input", (e) => {
+  const value = e.target.value;
+  const rgbColor = hexToRgb(value);
 
-    //console.log(`Control Value = ${e.target.value}`);
-  //  console.log(`Value to send = ${value}`);
-
-    controlWaterStreamsFlow(value)
-
+  ledStripHEXColor.innerHTML = value;
+  ledStripRGBColor.innerHTML = rgbColor.replaceAll("_", ", ");
+  updateRgbColor(rgbColor);
 });
-
-
-// Initialization
-
-initialize();
-
-
