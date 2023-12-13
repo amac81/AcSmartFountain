@@ -7,7 +7,7 @@
 #include <DNSServer.h>
 #include "SPIFFS.h"
 #include <FastLED.h>
-  
+
 #define DEVICE_NAME      "ACSMARTFOUNTAIN" //Initial name of the Thing, to create an own Access Point.
 // ESP32 supports up to 10 
 #define MAX_CLIENTS 4
@@ -57,14 +57,13 @@ const String localIPURL = "http://192.168.4.1";  // a string version of the loca
 String pumpPowerValue = "0";
 
 //RGB Led STRIP Hex color from webpage
-String ledStripRGBColor = "";
+String ledStripRGBColor = "0";
 
 //RGB Led STRIP Brightness
-String ledStripBrightness = "";
-
+String ledStripBrightness = "0";
 
 //mist mode value control
-String mistModeValue= "";
+String mistModeValue= "0";
 
 const char* PARAM_INPUT = "value";
 
@@ -104,7 +103,7 @@ String processor(const String& var){
     return pumpPowerValue;
   } 
 
-  if (var == "MISTCONTROLLIDERVALUE"){
+  if (var == "MISTCONTROLSLIDERVALUE"){
     return mistModeValue;
   } 
   
@@ -156,19 +155,41 @@ void updateLedStrip(){
     
     FastLED.show();
 }
+
+void readConfigFromSPIFFS (){
+  
+  File file = SPIFFS.open("/config.txt");
+  if(!file){
+      Serial.println("Failed to open file for reading");
+      return;
+  }
+  
+  Serial.println("File Content:");
+
+  while(file.available()){
+    Serial.write(file.read());
+  }
+
+  file.close();
+
+}
+
  
 void setup(){
-  delay(500); // power-up safety delay
 
+  // Serial port for debugging purposes
+  Serial.begin(115200);
+  
+  readConfigFromSPIFFS();
+
+  
+  delay(500); // power-up safety delay
+  
   FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
   FastLED.clear();  // clear all pixel data
   FastLED.show();
 
-  delay(500); // power-up safety delay
   
-  // Serial port for debugging purposes
-  Serial.begin(115200);
-
   //motor controller
   pinMode(A1A, OUTPUT);
   pinMode(A1B, OUTPUT);
