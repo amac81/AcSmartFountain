@@ -5,7 +5,7 @@
 #include <ESPAsyncWebServer.h>
 #include <AsyncTCP.h>  //https://github.com/me-no-dev/AsyncTCP using the latest dev version from @me-no-dev
 #include <DNSServer.h>
-#include "SPIFFS.h"
+#include <LittleFS.h>
 #include <FastLED.h>
 
 #define DEVICE_NAME      "ACSMARTFOUNTAIN" //Initial name of the Thing, to create an own Access Point.
@@ -158,7 +158,7 @@ void updateLedStrip(){
 
 void readConfigFromSPIFFS (){
   
-  File file = SPIFFS.open("/config.txt");
+  File file = LittleFS.open("/config.txt", "r"); 
   if(!file){
       Serial.println("Failed to open file for reading");
       return;
@@ -177,11 +177,22 @@ void readConfigFromSPIFFS (){
  
 void setup(){
 
+   // To format all space in LITTLEFS - 1st use
+   // LittleFS.format();
+ 
+  
+  // Begin LittleFS
+  if (!LittleFS.begin())
+  {
+    Serial.println("An Error has occurred while mounting LittleFS");
+    return;
+  }
+
   // Serial port for debugging purposes
   Serial.begin(115200);
   
   readConfigFromSPIFFS();
-
+/*
   
   delay(500); // power-up safety delay
   
@@ -194,11 +205,11 @@ void setup(){
   pinMode(A1A, OUTPUT);
   pinMode(A1B, OUTPUT);
   
-   // Initialize SPIFFS
-  if(!SPIFFS.begin(true)){
-    Serial.println("An Error has occurred while mounting SPIFFS");
-    return;
-  }
+  // Initialize SPIFFS
+  //if(!SPIFFS.begin(true)){
+  //  Serial.println("An Error has occurred while mounting SPIFFS");
+  //  return;
+  //}
 
   // Set the WiFi mode to access point and station
   WiFi.mode(WIFI_MODE_AP);
@@ -217,22 +228,22 @@ void setup(){
   
   // Route for root / web page
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/index.html", String(), false, processor);
+    request->send(LittleFS, "/index.html", String(), false, processor);
   });
 
  // Route to load favicon.ico file
   server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/favicon.ico", "image/x-icon");
+    request->send(LittleFS, "/favicon.ico", "image/x-icon");
   });
   
   // Route to load style.css file
   server.on("/styles.css", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/styles.css", "text/css");
+    request->send(LittleFS, "/styles.css", "text/css");
   });
 
   // Route to load scripts.js file
   server.on("/scripts.js", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/scripts.js", "text/javascript");
+    request->send(LittleFS, "/scripts.js", "text/javascript");
   });
 
   // Send a GET request to <ESP_IP>/motorslider?value=<inputMessage>
@@ -295,12 +306,12 @@ void setup(){
       inputMessage = request->getParam(PARAM_INPUT)->value();
       mistModeValue = inputMessage;
 
-      /*
+      //
 
-        TODOOOOOOOOOOOOOOOOOO 
-        logic off mist control!!!
+       // TODOOOOOOOOOOOOOOOOOO 
+       // logic off mist control!!!
       
-      */    
+     //    
 
     }
     else {
@@ -311,7 +322,7 @@ void setup(){
 
 
   // Start server
-  server.begin();
+  server.begin();*/
 }
  
 void loop(){
