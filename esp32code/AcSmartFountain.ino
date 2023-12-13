@@ -157,6 +157,15 @@ void updateLedStrip(){
 }
 
 void readConfigFromSPIFFS (){
+
+  //https://arduino.stackexchange.com/questions/52578/saving-a-txt-file-to-sd-card-and-reading-each-content-data-to-txt-file-then-sav
+
+  String dataTemp;
+  String param;
+  String allData[75];
+  int pointer = 0;
+  int count = 0;
+  #define PRINTLN(count) Serial.print(" "); Serial.print(count); Serial.print(" = ");
   
   File file = LittleFS.open("/config.txt", "r"); 
   if(!file){
@@ -166,12 +175,31 @@ void readConfigFromSPIFFS (){
   
   Serial.println("File Content:");
 
-  while(file.available()){
-    Serial.write(file.read());
+  while (file.available()) {
+    char c = file.read(); // Get the next character
+    if (isPrintable(c)) 
+    {  
+      dataTemp.concat(c); 
+    } 
+    else if (c == '\n') // End of line
+    { 
+      param = dataTemp;  
+      dataTemp = "";  // Reset to null ready to read the next line
+      Serial.print(F("The parameter is: "));
+      Serial.println(param); // Show us the valu
+      allData[pointer] = param;
+      pointer++;
+      
+      for (count=0;count<13;count++) {
+        Serial.print("Parametro dentro ARRAY numero");
+        PRINTLN(count);
+        Serial.println(allData[count]);
+        delay(1000);
+      } 
+    }
   }
-
+  
   file.close();
-
 }
 
  
@@ -192,25 +220,17 @@ void setup(){
   Serial.begin(115200);
   
   readConfigFromSPIFFS();
-/*
   
   delay(500); // power-up safety delay
   
   FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
   FastLED.clear();  // clear all pixel data
   FastLED.show();
-
   
   //motor controller
   pinMode(A1A, OUTPUT);
   pinMode(A1B, OUTPUT);
   
-  // Initialize SPIFFS
-  //if(!SPIFFS.begin(true)){
-  //  Serial.println("An Error has occurred while mounting SPIFFS");
-  //  return;
-  //}
-
   // Set the WiFi mode to access point and station
   WiFi.mode(WIFI_MODE_AP);
 
@@ -322,7 +342,7 @@ void setup(){
 
 
   // Start server
-  server.begin();*/
+  server.begin();
 }
  
 void loop(){
