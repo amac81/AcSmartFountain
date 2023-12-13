@@ -54,7 +54,7 @@ const IPAddress subnetMask(255, 255, 255, 0);  // no need to change: https://avi
 const String localIPURL = "http://192.168.4.1";  // a string version of the local IP with http, used for redirecting clients to your webpage
 
 //motor slider controller
-String motorSliderValue = "0";
+String pumpPowerValue = "0";
 
 //RGB Led STRIP Hex color from webpage
 String ledStripRGBColor = "";
@@ -62,12 +62,13 @@ String ledStripRGBColor = "";
 //RGB Led STRIP Brightness
 String ledStripBrightness = "";
 
+
+//mist mode value control
+String mistModeValue= "";
+
 const char* PARAM_INPUT = "value";
 
 int rgbColor[3]; 
-
-// Set LED GPIO
-const int ledPin = 4;
 
 // Set RGB LED STRIP GPIO
 #define DATA_PIN 2
@@ -79,6 +80,7 @@ const int A1B = 26;
 int speed=0;
 
 // Set ULTRASONIC MIST GPIOS
+// TODO
 
 
 // Stores LED state
@@ -95,21 +97,15 @@ void setUpDNSServer(DNSServer &dnsServer, const IPAddress &localIP) {
   dnsServer.start(53, "*", localIP);
 }
 
-// Replaces placeholder with LED state value
 // Replaces placeholder with button section in your web page
 String processor(const String& var){
-  if(var == "STATE"){
-    if(digitalRead(ledPin)){
-      ledState = "ON";
-    }
-    else{
-      ledState = "OFF";
-    }
-    return ledState;
-  }
   
-  if (var == "MOTORSLIDERVALUE"){
-    return motorSliderValue;
+  if (var == "PUMPPOWERSLIDERVALUE"){
+    return pumpPowerValue;
+  } 
+
+  if (var == "MISTCONTROLLIDERVALUE"){
+    return mistModeValue;
   } 
   
   if (var == "LEDSTRIPRGBCOLOR"){
@@ -162,9 +158,14 @@ void updateLedStrip(){
 }
  
 void setup(){
-  delay(3000); // power-up safety delay
-  FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  delay(500); // power-up safety delay
 
+  FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.clear();  // clear all pixel data
+  FastLED.show();
+
+  delay(500); // power-up safety delay
+  
   // Serial port for debugging purposes
   Serial.begin(115200);
 
@@ -172,8 +173,6 @@ void setup(){
   pinMode(A1A, OUTPUT);
   pinMode(A1B, OUTPUT);
   
-  pinMode(ledPin, OUTPUT);
-
    // Initialize SPIFFS
   if(!SPIFFS.begin(true)){
     Serial.println("An Error has occurred while mounting SPIFFS");
@@ -215,32 +214,20 @@ void setup(){
     request->send(SPIFFS, "/scripts.js", "text/javascript");
   });
 
-  // Route to set GPIO to HIGH
-  server.on("/on", HTTP_GET, [](AsyncWebServerRequest *request){
-    digitalWrite(ledPin, HIGH);    
-    request->send(SPIFFS, "/index.html", String(), false, processor);
-  });
-  
-  // Route to set GPIO to LOW
-  server.on("/off", HTTP_GET, [](AsyncWebServerRequest *request){
-    digitalWrite(ledPin, LOW);    
-    request->send(SPIFFS, "/index.html", String(), false, processor);
-  });
-
   // Send a GET request to <ESP_IP>/motorslider?value=<inputMessage>
-  server.on("/motorslider", HTTP_GET, [] (AsyncWebServerRequest *request) {
+  server.on("/pumppower", HTTP_GET, [] (AsyncWebServerRequest *request) {
     String inputMessage;
     // GET input1 value on <ESP_IP>/motorslider?value=<inputMessage>
     if (request->hasParam(PARAM_INPUT)) {
       inputMessage = request->getParam(PARAM_INPUT)->value();
-      motorSliderValue = inputMessage;
+      pumpPowerValue = inputMessage;
 
-      speed = motorSliderValue.toInt();
+      speed = pumpPowerValue.toInt();
 
       analogWrite(A1B,0);
       analogWrite(A1A,speed);  
       
-      //Serial.print("Motor value= " + motorSliderValue.toInt());
+      //Serial.print("Motor value= " + pumpPowerValue.toInt());
     }
     else {
       inputMessage = "No message sent";
@@ -271,9 +258,29 @@ void setup(){
     if (request->hasParam(PARAM_INPUT)) {
       inputMessage = request->getParam(PARAM_INPUT)->value();
       ledStripBrightness = inputMessage;
-
       updateLedStrip();
+    }
+    else {
+      inputMessage = "No message sent";
+    }
+    request->send(200, "text/plain", "OK");
+  });
+
+  // Send a GET request to <ESP_IP>/mistmode?value=<inputMessage>
+  server.on("/mistmode", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String inputMessage;
+    // GET input1 value on <ESP_IP>/mistmode?value=<inputMessage>
+    if (request->hasParam(PARAM_INPUT)) {
+      inputMessage = request->getParam(PARAM_INPUT)->value();
+      mistModeValue = inputMessage;
+
+      /*
+
+        TODOOOOOOOOOOOOOOOOOO 
+        logic off mist control!!!
       
+      */    
+
     }
     else {
       inputMessage = "No message sent";
