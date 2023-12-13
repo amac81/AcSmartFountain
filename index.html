@@ -33,7 +33,6 @@
           <label for="brightnessSlider">Brightness:</label>
           <input 
               type="range" 
-              onchange="updateBrigthness(this)" 
               id="brightnessSlider" 
               min="0" 
               max="255" 
@@ -41,37 +40,42 @@
               step="1" 
               class="slider"
           />
-          <p>VALUE = <span id="textBrightnessSliderValue">%BRIGHTNESSSLIDERVALUE%</span></p>
+          <p>VALUE = <span id="brightnessSliderValue">%BRIGHTNESSSLIDERVALUE%</span></p>
       </div>
-    </div>
-    <div class="control-container" id="led-control">
-      <p>Led GPIO state: <strong> %STATE%</strong></p>
-      <p><a href="/on"><button class="button">ON</button></a></p>
-      <p><a href="/off"><button class="button button2">OFF</button></a></p>
     </div>
 
     <div class="control-container" id="pump-control">
       <div class="range-input">
-        <label for="pwmMotorSlider">Pump control:</label>
+        <label for="pumpPowerSlider">Pump control:</label>
         <input 
             type="range" 
-            onchange="updateSliderPWM(this)" 
-            id="pwmMotorSlider" 
+            id="pumpPowerSlider" 
             min="0" 
             max="255" 
-            value="%MOTORSLIDERVALUE%" 
+            value="%PUMPPOWERSLIDERVALUE%" 
             step="1" 
             class="slider"
         />
-        <p>VALUE = <span id="textMotorSliderValue">%MOTORSLIDERVALUE%</span></p>
+        <p>VALUE = <span id="pumpPowerSliderValue">%PUMPPOWERSLIDERVALUE%</span></p>
       </div>
     </div>
 
     <div class="control-container" id="mist-control">
-      <p>Fog control</p>
-      <button id="fog-control">FOG</button>  
+      <div class="range-input">
+        <label for="mistModeSlider">Mist control:</label>
+        <input 
+            type="range" 
+            id="mistModeSlider" 
+            min="0" 
+            max="2" 
+            value="%MISTCONTROLSLIDERVALUE%" 
+            step="1" 
+            class="slider"
+        />
+        <p>VALUE = <span id="mistModeSliderValue">%MISTCONTROLSLIDERVALUE%</span></p>
+      </div>
     </div>
-  
+   
   </div>  
   <footer>
     <h4>&copy; 2023 arnaldocanelas@gmail.com</h4>
