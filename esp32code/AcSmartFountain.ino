@@ -63,7 +63,7 @@ String ledStripRGBColor = "0";
 String ledStripBrightness = "0";
 
 //mist mode value control
-String mistModeValue= "0";
+String mistModeValue = "0";
 
 const char* PARAM_INPUT = "value";
 
@@ -75,8 +75,7 @@ int rgbColor[3];
 // Set WATER PUMP CONTROL MODULE (HW-063) GPIOS
 const int A1A = 27;
 const int A1B = 26;
-
-int speed=0;
+int pumpPower = 0;
 
 // Set ULTRASONIC MIST GPIOS
 // TODO
@@ -157,49 +156,42 @@ void updateLedStrip(){
 }
 
 void readConfigFromSPIFFS (){
-
-  //https://arduino.stackexchange.com/questions/52578/saving-a-txt-file-to-sd-card-and-reading-each-content-data-to-txt-file-then-sav
-
-  String dataTemp;
-  String param;
-  String allData[75];
-  int pointer = 0;
-  int count = 0;
-  #define PRINTLN(count) Serial.print(" "); Serial.print(count); Serial.print(" = ");
   
+  //config.txt structure:
+  //Rvalue;Gvalue;Bvalue;brightnessValue;pumpPowerValue;mistModeValue
+  int configs[6] = {};
+  int i = 0;
+
   File file = LittleFS.open("/config.txt", "r"); 
   if(!file){
       Serial.println("Failed to open file for reading");
       return;
   }
-  
-  Serial.println("File Content:");
-
+     
   while (file.available()) {
-    char c = file.read(); // Get the next character
-    if (isPrintable(c)) 
-    {  
-      dataTemp.concat(c); 
-    } 
-    else if (c == '\n') // End of line
-    { 
-      param = dataTemp;  
-      dataTemp = "";  // Reset to null ready to read the next line
-      Serial.print(F("The parameter is: "));
-      Serial.println(param); // Show us the valu
-      allData[pointer] = param;
-      pointer++;
-      
-      for (count=0;count<13;count++) {
-        Serial.print("Parametro dentro ARRAY numero");
-        PRINTLN(count);
-        Serial.println(allData[count]);
-        delay(1000);
-      } 
-    }
-  }
-  
+    configs[i] = file.parseInt();   
+    i++;
+  }  
   file.close();
+  
+  //apply configs
+
+  rgbColor[0] = configs[0];
+  rgbColor[1] = configs[1];
+  rgbColor[2] = configs[2];
+  
+  FastLED.setBrightness(configs[3]);
+  for (int i = 0; i < NUM_LEDS; i++) {
+     leds[i] = CRGB(rgbColor[0], rgbColor[1], rgbColor[2]);
+  }
+  FastLED.show();
+
+  pumpPower = configs[4];
+  analogWrite(A1B,0);
+  analogWrite(A1A, pumpPower); 
+  
+  char strAux[4];
+  mistModeValue = itoa(configs[5], strAux, 10);
 }
 
  
@@ -218,8 +210,7 @@ void setup(){
 
   // Serial port for debugging purposes
   Serial.begin(115200);
-  
-  readConfigFromSPIFFS();
+ 
   
   delay(500); // power-up safety delay
   
@@ -274,10 +265,10 @@ void setup(){
       inputMessage = request->getParam(PARAM_INPUT)->value();
       pumpPowerValue = inputMessage;
 
-      speed = pumpPowerValue.toInt();
+      pumpPower = pumpPowerValue.toInt();
 
       analogWrite(A1B,0);
-      analogWrite(A1A,speed);  
+      analogWrite(A1A, pumpPower);  
       
       //Serial.print("Motor value= " + pumpPowerValue.toInt());
     }
@@ -343,6 +334,8 @@ void setup(){
 
   // Start server
   server.begin();
+
+  readConfigFromSPIFFS();
 }
  
 void loop(){
