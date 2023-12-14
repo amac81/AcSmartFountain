@@ -91,11 +91,12 @@ footer h4 {
 .range-input input[type="range"]{
     margin-top: 8px;
 }
+
 .form-control input[type="color"]{
     width: 50px;
     height: 50px;
 }
-
+    
 .range-input, 
 .form-control {
     display: flex;    
@@ -126,13 +127,58 @@ footer h4 {
     color:#f70909;
 }
 
+.form-control-radio {
+    font-size: 1.2rem; 
+    display: flex;
+    grid-template-columns: 1em auto;
+    gap: 0.5rem;
+    flex-direction:row;    
+}
+  
+
+input[type="radio"] {
+    /* Add if not using autoprefixer */
+    -webkit-appearance: none;
+    appearance: none;
+    margin-left: 2rem;
+    font: inherit;
+    color: currentColor;
+    width: 1.2em;
+    height: 1.2em;
+    border: 0.15em solid currentColor;
+    border-radius: 50%;
+    transform: translateY(-0.075em);
+    display: grid;
+    place-content: center;
+
+}
+
+input[type="radio"]::before {
+    content: "";
+    width: 0.65em;
+    height: 0.65em;
+    border-radius: 50%;
+    transform: scale(0);
+    transition: 120ms transform ease-in-out;
+    box-shadow: inset 1em 1em var(--form-control-color);
+    background-color: #8c09f7;
+  }
+  
+ input[type="radio"]:checked::before {
+    transform: scale(1);
+ }
+ 
+.form-control-radio + .form-control-radio {
+    margin-top: 1em;
+ }
+  
 
 /* Sliders */
 
 .slider { 
     -webkit-appearance: none; 
     height: 39px; 
-    background: #ff5c7f;
+    background: #72819c;
     border-radius: 20px 20px 20px 20px;
     outline: none; 
     -webkit-transition: .2s; 
