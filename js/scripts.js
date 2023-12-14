@@ -1,7 +1,8 @@
 // Element Select
-const color = document.querySelector("#color");
+const colorPicker = document.querySelector("#colorPicker");
 const ledStripHEXColor = document.querySelector("#ledStripHEXColor");
 const ledStripRGBColor = document.querySelector("#ledStripRGBColor");
+const ledRgbValue = document.querySelector("#ledRgbValue");
 const pumpPowerSlider = document.querySelector("#pumpPowerSlider");
 const pumpPowerSliderValue = document.querySelector("#pumpPowerSliderValue");
 const brightnessSlider =  document.querySelector("#brightnessSlider");
@@ -20,6 +21,23 @@ function XMLHttpRequestSend(path, value){
 function updatePumpPower(value) {
   pumpPowerSliderValue.innerHTML = value;
   XMLHttpRequestSend("/pumppower?value=", value);
+}
+
+//https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
+const rgbToHex = (r, g, b) => '#' + [parseInt(r), parseInt(g), parseInt(b)].map(x => x.toString(16).padStart(2, '0')).join('')
+
+function updateColorInfo(value){
+  const rgbColor = value.replaceAll("_", ", ");
+  
+  ledStripRGBColor.innerHTML = rgbColor;
+
+  let rgb = []; 
+  rgb = value.split("_"); 
+  
+  const hexColor = rgbToHex(rgb[0], rgb[1], rgb[2]);
+
+  ledStripHEXColor.innerHTML = hexColor;
+  colorPicker.value = hexColor;
 }
 
 function updateRgbColor(value) {
@@ -43,9 +61,13 @@ function hexToRgb (hex) {
   return `${("0x"+ hex[1] + hex[2]) | 0}_${("0x" + hex[3] + hex[4]) | 0}_${("0x" + hex[5] + hex[6]) | 0}`;
 }
 
+function init (){
+  updateColorInfo(ledRgbValue.innerHTML);
+}
+
 // Events
 
-color.addEventListener("input", (e) => {
+colorPicker.addEventListener("input", (e) => {
   const value = e.target.value;
   updateRgbColor(value);
 });
@@ -61,3 +83,5 @@ pumpPowerSlider.addEventListener("input", (e) => {
 mistModeSlider.addEventListener("input", (e) => {
   updateMistMode(e.target.value);
 });
+
+init();

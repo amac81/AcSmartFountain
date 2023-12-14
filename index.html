@@ -20,11 +20,11 @@
         <label for="color">Rgb Led control:</label>
         <input 
             type="color"            
-            id="color" 
-            name="color" 
-            value="%LEDSTRIPRGBCOLOR%"
+            id="colorPicker" 
+            name="color"             
         />
-        <p>HEX = <span id="ledStripHEXColor">%LEDSTRIPRGBCOLOR%</span></p>
+        <p id="ledRgbValue" class="hidden">%LEDSTRIPRGBCOLOR%</p>
+        <p>HEX = <span id="ledStripHEXColor"></span></p>
         <p>rgb(<span id="ledStripRGBColor"></span>)</p>
       </div>
     </div>
