@@ -67,6 +67,16 @@ function init (){
 
 // Events
 
+
+document.addEventListener('input', (e)=>
+{
+  if(e.target.getAttribute('name')=="rgbEffectRadios")
+  {
+    XMLHttpRequestSend("/rgbeffect?value=", e.target.value);
+  }
+});
+
+
 colorPicker.addEventListener("input", (e) => {
   const value = e.target.value;
   updateRgbColor(value);
