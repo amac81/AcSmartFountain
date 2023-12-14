@@ -168,8 +168,15 @@ void readConfigFromSPIFFS (){
       return;
   }
      
-  while (file.available()) {
-    configs[i] = file.parseInt();   
+  while (file.available() && i<6) {
+    configs[i] = file.parseInt();
+
+    Serial.print("param ");
+    Serial.print(i);
+    Serial.print(" = ");
+    Serial.print(configs[i]);    
+    Serial.println();
+
     i++;
   }  
   file.close();
@@ -189,11 +196,50 @@ void readConfigFromSPIFFS (){
   pumpPower = configs[4];
   analogWrite(A1B,0);
   analogWrite(A1A, pumpPower); 
-  
-  char strAux[4];
+
+  char strAux[4] = {};
+ 
+  pumpPowerValue = itoa(pumpPower, strAux, 10);
   mistModeValue = itoa(configs[5], strAux, 10);
+  
+  ledStripRGBColor = itoa(rgbColor[0], strAux, 10);
+  ledStripRGBColor += "_";
+  ledStripRGBColor += itoa(rgbColor[1], strAux, 10);
+  ledStripRGBColor += "_";
+  ledStripRGBColor += itoa(rgbColor[2], strAux, 10);
+  ledStripBrightness = itoa(configs[3], strAux, 10);
 }
 
+void saveConfigs() {
+  //config.txt structure:
+  //Rvalue;Gvalue;Bvalue;brightnessValue;pumpPowerValue;mistModeValue
+  
+  File file = LittleFS.open("/config.txt", "w"); 
+  if(!file){
+      Serial.println("Failed to open file for write");
+      return;
+  }
+     
+  String fileLine = "";
+  fileLine += rgbColor[0];
+  fileLine += ";";
+  fileLine += rgbColor[1];
+  fileLine += ";";
+  fileLine += rgbColor[2];
+  fileLine += ";";
+  fileLine += ledStripBrightness;
+  fileLine += ";";
+  fileLine += pumpPowerValue;
+  fileLine += ";";
+  fileLine += mistModeValue;
+
+  if(file){
+    file.println(fileLine);
+  } 
+  
+  file.close();
+  
+}
  
 void setup(){
 
@@ -269,8 +315,9 @@ void setup(){
 
       analogWrite(A1B,0);
       analogWrite(A1A, pumpPower);  
+
+      saveConfigs();
       
-      //Serial.print("Motor value= " + pumpPowerValue.toInt());
     }
     else {
       inputMessage = "No message sent";
@@ -287,6 +334,7 @@ void setup(){
       ledStripRGBColor = inputMessage;
       
       updateLedStrip();
+      saveConfigs();
     }
     else {
       inputMessage = "No message sent";
@@ -322,7 +370,9 @@ void setup(){
        // TODOOOOOOOOOOOOOOOOOO 
        // logic off mist control!!!
       
-     //    
+     //
+
+     saveConfigs();
 
     }
     else {
