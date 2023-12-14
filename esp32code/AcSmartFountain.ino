@@ -59,6 +59,9 @@ String pumpPowerValue = "0";
 //RGB Led STRIP Hex color from webpage
 String ledStripRGBColor = "0";
 
+//RGB effect value
+String rgbEffectValue = "none";
+
 //RGB Led STRIP Brightness
 String ledStripBrightness = "0";
 
@@ -83,6 +86,9 @@ int pumpPower = 0;
 
 // Stores LED state
 String ledState;
+
+//used in fireEffect
+unsigned int lastTime = 0;
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -114,6 +120,10 @@ String processor(const String& var){
     return ledStripBrightness;
   }
 
+  if (var == "RGBEFFECTVALUE"){
+    return rgbEffectValue;
+  }
+
   return String();
 }
 
@@ -143,6 +153,8 @@ void splitString (String str){
 }
 
 void updateLedStrip(){
+
+    rgbEffectValue = "none";
     
     FastLED.setBrightness(ledStripBrightness.toInt());
     
@@ -357,6 +369,24 @@ void setup(){
     request->send(200, "text/plain", "OK");
   });
 
+  // Send a GET request to <ESP_IP>/rgbeffect?value=<inputMessage>
+  server.on("/rgbeffect", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String inputMessage;
+    // GET input1 value on <ESP_IP>/rgbeffect?value=<inputMessage>
+    if (request->hasParam(PARAM_INPUT)) {
+      inputMessage = request->getParam(PARAM_INPUT)->value();
+      
+      rgbEffectValue = inputMessage;
+    //  updateLedEffect();
+      
+    }
+    else {
+      inputMessage = "No message sent";
+    }
+    request->send(200, "text/plain", "OK");
+  });
+  
+
   // Send a GET request to <ESP_IP>/mistmode?value=<inputMessage>
   server.on("/mistmode", HTTP_GET, [] (AsyncWebServerRequest *request) {
     String inputMessage;
@@ -391,4 +421,67 @@ void setup(){
 void loop(){
   dnsServer.processNextRequest();  // I call this atleast every 10ms in my other projects (can be higher but I haven't tested it for stability)
   delay(DNS_INTERVAL);       // seems to help with stability, if you are doing other things in the loop this may not be needed
+
+  if(rgbEffectValue == "fire"){
+    fireEffect();
+  }
+}
+
+
+
+void fireEffect() {
+
+  unsigned int time = millis();
+
+  lastTime = time;
+
+  for (int i = 0; i < NUM_LEDS; i++) {
+    //adjust the mult and divide to change the global effect
+    // will be added to advanced settings later
+    n = inoise8(i*250 , (time+i)/NOISE_SPEED_COLOR);
+
+    ni = inoise8(i*500 , (time+i)/NOISE_SPEED_INTENSITY);
+
+    //You can change the easing function here
+    //Used to avoid a linear effect and give a more natural curve.
+    float v = QuadraticEaseInOut(n/255);
+    float vi = QuadraticEaseInOut(ni/255);
+    
+    vi = (MAX_INTENSITY - MIN_INTENSITY) * v + MIN_INTENSITY;
+    float red = vi *(RED*v);
+    float yellow = vi *((MAX_VARIATION - MIN_VARIATION)*v + MIN_VARIATION);
+
+    leds[i] = CRGB(red , yellow , 0);
+  }
+  FastLED.show();
+}
+
+float CubicEaseInOut(float p)
+{
+  if (p < 0.5)
+  {
+    return 4 * p * p * p;
+  }
+  else
+  {
+    float f = ((2 * p) - 2);
+    return 0.5 * f * f * f + 1;
+  }
+}
+
+float QuadraticEaseInOut(float p)
+{
+  if (p < 0.5)
+  {
+    return 2 * p * p;
+  }
+  else
+  {
+    return (-2 * p * p) + (4 * p) - 1;
+  }
+}
+
+float SineEaseOut(float p)
+{
+  return sin(p * M_PI_2);
 }
